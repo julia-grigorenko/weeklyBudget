@@ -4,6 +4,10 @@ class Budget {
     this.budget = Number(budget);
     this.budgetLeft = this.budget;
   }
+  // Subtract from the budget
+  substractFromBudget(amount) {
+    return this.budgetLeft -= amount;
+  }
 }
 
 // Everything related to HTML
@@ -25,10 +29,10 @@ class HTML {
       messageWrapper.remove();
     }, 2500);
   }
+
   // Displaythe expenses from the form into the list
   addExpenseToList(name, amount){
     const expensesList = document.querySelector('#expenses ul');
-
     // Create li element
     const li = document.createElement('li');
     li.className = 'list-group-item d-flex justify-content-between align-items-center';
@@ -37,20 +41,33 @@ class HTML {
       ${name}
       <span class="badge badge-primary badge-pill">$ ${amount}</span>
     `;
-
     // Insert into the HTML
     expensesList.appendChild(li);
   }
+
+  //  Substract expense amount from budget
+  trackBudget(amount) {
+    const budgetLeftDollars = budget.substractFromBudget(amount);
+    budgetLeft.innerHTML = `${budgetLeftDollars}`;
+    // Check when 25% is left
+    if((budget.budget / 4) > budgetLeftDollars) {
+      // Add some classes and remove others
+      budgetLeft.parentElement.parentElement.classList.remove('alert-success', 'alert-warning');
+      budgetLeft.parentElement.parentElement.classList.add('alert-danger');
+    } else if ((budget.budget / 2) > budgetLeftDollars) {
+      budgetLeft.parentElement.parentElement.classList.remove('alert-success');
+      budgetLeft.parentElement.parentElement.classList.add('alert-warning');
+    }
+  }
 }
+
 // Variables
 const addExpenseForm = document.querySelector('#add-expense');
 const budgetTotal = document.querySelector('span#total');
 const budgetLeft = document.querySelector('span#left');
-
 const html = new HTML();
 let budget;
 let userBudget;
-
 
 // Event listeners
 function eventListeners () {
@@ -80,37 +97,11 @@ function eventListeners () {
     } else {
         // Add the expenses into the list
         html.addExpenseToList(expenseName, amount);
+        html.trackBudget(amount);
+        html.printMessage('Added...', 'alert-success');
     }
   });
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 // Init app
 eventListeners();
